@@ -1,0 +1,36 @@
+# =============================================================================
+# .gitignore — jol-deploy
+# =============================================================================
+
+# --- IDE ---
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# --- Secrets & Credentials ---
+*.secret
+*.credentials
+.env
+.env.*
+*.pem
+*.key
+*.crt
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
