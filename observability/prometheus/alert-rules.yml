@@ -1,0 +1,55 @@
+---
+# Alert rules for JOL tenant monitoring
+groups:
+  - name: tenant_availability
+    rules:
+      - alert: TenantDown
+        expr: up{job="tenant_health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Tenant {{ $labels.instance }} is down"
+          description: "{{ $labels.instance }} has been unreachable for 2 minutes."
+
+      - alert: TenantHighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency on {{ $labels.instance }}"
+          description: "P95 latency is above 5s for 5 minutes."
+
+  - name: infrastructure_health
+    rules:
+      - alert: HighCPU
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU on {{ $labels.instance }}"
+
+      - alert: HighMemory
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+
+      - alert: DiskSpaceLow
+        expr: (1 - node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space low on {{ $labels.instance }}"
+
+      - alert: TLSCertExpiring
+        expr: ssl_certificate_expiry_seconds < 30 * 86400
+        labels:
+          severity: warning
+        annotations:
+          summary: "TLS certificate expiring soon on {{ $labels.instance }}"

@@ -1,0 +1,31 @@
+# =============================================================================
+# OPA Policy: Security Baseline
+# =============================================================================
+
+package jol.security
+
+import future.keywords.if
+
+# Deny containers running as root
+deny[msg] if {
+    input.container.run_as_root == true
+    msg := sprintf("container '%s' must not run as root", [input.container.name])
+}
+
+# Deny images without health check
+deny[msg] if {
+    not input.container.healthcheck
+    msg := sprintf("container '%s' must define a healthcheck", [input.container.name])
+}
+
+# Deny images with latest tag
+deny[msg] if {
+    endswith(input.image.tag, "latest")
+    msg := sprintf("image '%s' must not use 'latest' tag", [input.image.name])
+}
+
+# Require resource limits
+deny[msg] if {
+    not input.container.resources.limits
+    msg := sprintf("container '%s' must define resource limits", [input.container.name])
+}

@@ -1,0 +1,35 @@
+# =============================================================================
+# OPA Policy: Deployment Rules
+# =============================================================================
+
+package jol.deploy
+
+import future.keywords.if
+
+# Deny deployment without security scan
+deny[msg] if {
+    not input.security_scan_passed
+    msg := "deployment blocked: security scan not passed"
+}
+
+# Deny deployment without backup
+deny[msg] if {
+    input.environment == "production"
+    not input.backup_completed
+    msg := "production deployment blocked: backup not completed"
+}
+
+# Deny deployment to production without approval
+deny[msg] if {
+    input.environment == "production"
+    not input.approval_given
+    msg := "production deployment blocked: approval required"
+}
+
+# Require canary for production
+deny[msg] if {
+    input.environment == "production"
+    input.deploy_strategy != "canary"
+    input.deploy_strategy != "rolling"
+    msg := "production must use canary or rolling strategy"
+}

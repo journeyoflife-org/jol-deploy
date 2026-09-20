@@ -1,0 +1,43 @@
+---
+# Webserver role — Docker + nginx reverse proxy for tenant websites.
+
+- name: Install Docker prerequisites
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-v2
+      - python3-docker
+    state: present
+
+- name: Enable Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Create tenant directory
+  ansible.builtin.file:
+    path: "/opt/jol/tenants/{{ tenant }}"
+    state: directory
+    owner: jol-admin
+    group: jol-admin
+    mode: "0750"
+
+- name: Deploy docker-compose.yml from template
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "/opt/jol/tenants/{{ tenant }}/docker-compose.yml"
+    mode: "0640"
+  notify: Restart tenant containers
+
+- name: Deploy nginx config from template
+  ansible.builtin.template:
+    src: nginx-tenant.conf.j2
+    dest: "/opt/jol/tenants/{{ tenant }}/nginx.conf"
+    mode: "0640"
+  notify: Reload nginx
+
+- name: Start tenant containers
+  community.docker.docker_compose_v2:
+    project_src: "/opt/jol/tenants/{{ tenant }}"
+    state: started

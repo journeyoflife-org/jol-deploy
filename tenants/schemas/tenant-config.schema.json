@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JOL Tenant Configuration",
+  "description": "Schema for tenant website configuration files",
+  "type": "object",
+  "required": ["tenant_id", "name", "country", "domain", "environment", "resources"],
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,62}$",
+      "description": "Unique tenant identifier (lowercase, hyphens allowed)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Human-readable tenant name"
+    },
+    "country": {
+      "type": "string",
+      "enum": ["lt", "lv", "ee", "pl", "de", "fr", "it", "es", "pt", "other"],
+      "description": "ISO 3166-1 alpha-2 country code"
+    },
+    "domain": {
+      "type": "string",
+      "format": "hostname",
+      "description": "Primary domain for the tenant"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["development", "staging", "production"],
+      "description": "Target deployment environment"
+    },
+    "resources": {
+      "type": "object",
+      "required": ["cpu", "memory", "disk"],
+      "properties": {
+        "cpu": { "type": "string", "pattern": "^[0-9.]+$" },
+        "memory": { "type": "string", "pattern": "^[0-9]+[MG]$" },
+        "disk": { "type": "string", "pattern": "^[0-9]+[MG]$" }
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Enabled feature flags"
+    },
+    "contacts": {
+      "type": "object",
+      "properties": {
+        "admin_email": { "type": "string", "format": "email" },
+        "tech_email": { "type": "string", "format": "email" }
+      }
+    },
+    "backup": {
+      "type": "object",
+      "properties": {
+        "rpo_hours": { "type": "integer", "minimum": 1 },
+        "rto_hours": { "type": "integer", "minimum": 1 },
+        "retention_days": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "vm": {
+      "type": "object",
+      "description": "Target VM assignment for the tenant",
+      "properties": {
+        "host": { "type": "string", "description": "VM hostname" },
+        "ip": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$", "description": "VM IP address" },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535, "description": "Application port" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

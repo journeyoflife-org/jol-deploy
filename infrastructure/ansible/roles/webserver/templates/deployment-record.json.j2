@@ -1,0 +1,12 @@
+{
+  "deployment_id": "{{ ansible_date_time.iso8601_basic_short }}",
+  "tenant": "{{ tenant }}",
+  "environment": "{{ jol_environment }}",
+  "commit_sha": "{{ deploy_commit_sha | default('unknown') }}",
+  "image_digest": "{{ deploy_image_digest | default('unknown') }}",
+  "operator": "{{ deploy_operator | default('ansible') }}",
+  "timestamp": "{{ ansible_date_time.iso8601 }}",
+  "host": "{{ inventory_hostname }}",
+  "pre_state": "{{ deploy_pre_state | default('unknown') }}",
+  "post_state": "deployed"
+}

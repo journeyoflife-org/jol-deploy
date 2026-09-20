@@ -1,0 +1,6 @@
+---
+app_port: 3000
+app_version: latest
+app_memory_limit: "512M"
+app_cpu_limit: "1.0"
+tenant_domain: ""

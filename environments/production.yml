@@ -1,0 +1,37 @@
+---
+# Production environment configuration
+environment: production
+
+defaults:
+  replicas: 2
+  log_level: warn
+  debug: false
+  tls_enabled: true
+
+resources:
+  cpu: "2.0"
+  memory: "1G"
+  disk: "20G"
+
+deploy:
+  strategy: canary
+  health_check_timeout: 30
+  auto_rollback: true
+  canary_steps: [5, 25, 100]
+  canary_interval: 60
+
+monitoring:
+  enabled: true
+  metrics_interval: 15s
+  alerting: true
+
+backup:
+  enabled: true
+  rpo_hours: 24
+  rto_hours: 4
+  retention_days: 30
+
+security:
+  waf_enabled: true
+  rate_limit: 100
+  ddos_protection: true

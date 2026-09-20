@@ -1,0 +1,12 @@
+---
+#cloud-config
+# Web server VM cloud-init — extends base with nginx + tenant hosting
+hostname: ${vm_name}
+
+runcmd:
+  - apt-get install -y nginx
+  - systemctl enable --now nginx
+  - mkdir -p /opt/jol/tenants
+  - mkdir -p /opt/jol/deployments
+  - mkdir -p /var/log/jol-deploy
+  - chown jol-admin:jol-admin /opt/jol/tenants /opt/jol/deployments /var/log/jol-deploy

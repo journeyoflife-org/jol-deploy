@@ -1,0 +1,53 @@
+---
+# Prometheus configuration for JOL multi-tenant monitoring
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+rule_files:
+  - /etc/prometheus/alert-rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: prometheus
+    static_configs:
+      - targets: [localhost:9090]
+
+  # Node exporters (all hosts)
+  - job_name: node_exporter
+    static_configs:
+      - targets:
+          - 10.40.40.10:9100   # rag-prod-lt01
+          - 10.40.40.11:9100   # mcp-prod-lt01
+          - 10.30.30.10:9100   # llm-prod-lt01
+          - 10.40.40.20:9100   # her-prod-lt01
+
+  # Tenant health endpoints
+  - job_name: tenant_health
+    metrics_path: /health
+    scrape_interval: 30s
+    static_configs:
+      - targets:
+          - 10.40.40.20:80     # her-prod-lt01 (web server)
+
+  # Docker container metrics
+  - job_name: docker
+    static_configs:
+      - targets:
+          - 10.40.40.20:9323   # Docker metrics
+
+  # Application metrics (per tenant)
+  - job_name: tenant_metrics
+    metrics_path: /metrics
+    scrape_interval: 30s
+    static_configs:
+      - targets:
+          - 10.40.40.20:3001   # basilica-vilnius
+          - 10.40.40.20:3002   # cathedral-kaunas

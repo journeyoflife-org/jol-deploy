@@ -1,0 +1,15 @@
+---
+# Checkov configuration for IaC security scanning
+compact: true
+download-external-modules: false
+evaluate-variables: true
+framework:
+  - terraform
+  - dockerfile
+  - kubernetes
+  - github_actions
+quiet: true
+skip-check:
+  # Document any skipped checks with justification
+  - CKV_DOCKER_2  # HEALTHCHECK — handled by compose template
+soft-fail: false

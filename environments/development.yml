@@ -1,0 +1,26 @@
+---
+# Development environment configuration
+environment: development
+
+defaults:
+  replicas: 1
+  log_level: debug
+  debug: true
+  tls_enabled: false
+
+resources:
+  cpu: "0.5"
+  memory: "256M"
+  disk: "5G"
+
+deploy:
+  strategy: rolling
+  health_check_timeout: 120
+  auto_rollback: true
+
+monitoring:
+  enabled: true
+  metrics_interval: 30s
+
+backup:
+  enabled: false

@@ -1,0 +1,28 @@
+---
+# Staging environment configuration
+environment: staging
+
+defaults:
+  replicas: 1
+  log_level: info
+  debug: false
+  tls_enabled: true
+
+resources:
+  cpu: "1.0"
+  memory: "512M"
+  disk: "10G"
+
+deploy:
+  strategy: rolling
+  health_check_timeout: 60
+  auto_rollback: true
+
+monitoring:
+  enabled: true
+  metrics_interval: 15s
+
+backup:
+  enabled: true
+  rpo_hours: 24
+  retention_days: 14

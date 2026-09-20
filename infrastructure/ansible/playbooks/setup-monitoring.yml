@@ -1,0 +1,23 @@
+---
+# Setup monitoring stack (Prometheus + Grafana + Loki) on management host.
+- name: Setup monitoring
+  hosts: management
+  become: true
+  gather_facts: true
+
+  roles:
+    - common
+    - monitoring
+
+  post_tasks:
+    - name: Verify Prometheus
+      ansible.builtin.uri:
+        url: "http://localhost:9090/-/healthy"
+        status_code: 200
+      register: prom_health
+
+    - name: Verify Grafana
+      ansible.builtin.uri:
+        url: "http://localhost:3000/api/health"
+        status_code: 200
+      register: grafana_health

@@ -1,0 +1,33 @@
+---
+# Tenant: Riga Cathedral
+# Country: Latvia (LV)
+
+tenant_id: riga-cathedral
+name: "Rīgas Doms"
+country: lv
+domain: "riga.cathedral.gyvenimo-kelias.lv"
+environment: production
+
+resources:
+  cpu: "1.0"
+  memory: "512M"
+  disk: "10G"
+
+features:
+  - mass-schedule
+  - parish-news
+  - contact-form
+
+contacts:
+  admin_email: "admin@riga.cathedral.gyvenimo-kelias.lv"
+  tech_email: "tech@gyvenimo-kelias.lt"
+
+backup:
+  rpo_hours: 24
+  rto_hours: 4
+  retention_days: 30
+
+vm:
+  host: her-prod-lt01
+  ip: 10.40.40.20
+  port: 3010

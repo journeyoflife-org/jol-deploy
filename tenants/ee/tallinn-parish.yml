@@ -1,0 +1,32 @@
+---
+# Tenant: Tallinn Parish
+# Country: Estonia (EE)
+
+tenant_id: tallinn-parish
+name: "Tallinna kogudus"
+country: ee
+domain: "tallinn.parish.gyvenimo-kelias.ee"
+environment: production
+
+resources:
+  cpu: "0.5"
+  memory: "256M"
+  disk: "5G"
+
+features:
+  - mass-schedule
+  - parish-news
+
+contacts:
+  admin_email: "admin@tallinn.parish.gyvenimo-kelias.ee"
+  tech_email: "tech@gyvenimo-kelias.lt"
+
+backup:
+  rpo_hours: 24
+  rto_hours: 8
+  retention_days: 30
+
+vm:
+  host: her-prod-lt01
+  ip: 10.40.40.20
+  port: 3020

@@ -1,0 +1,10 @@
+---
+- name: Restart tenant containers
+  community.docker.docker_compose_v2:
+    project_src: "/opt/jol/tenants/{{ tenant }}"
+    state: restarted
+
+- name: Reload nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: reloaded

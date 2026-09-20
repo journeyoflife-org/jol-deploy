@@ -1,0 +1,41 @@
+---
+# Monitoring role — Prometheus + Grafana + Loki stack.
+
+- name: Install monitoring packages
+  ansible.builtin.apt:
+    name:
+      - prometheus
+      - prometheus-node-exporter
+    state: present
+
+- name: Deploy Prometheus config
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    mode: "0644"
+  notify: Restart prometheus
+
+- name: Deploy alerting rules
+  ansible.builtin.copy:
+    src: alert-rules.yml
+    dest: /etc/prometheus/alert-rules.yml
+    mode: "0644"
+  notify: Restart prometheus
+
+- name: Deploy Grafana dashboards
+  ansible.builtin.copy:
+    src: dashboards/
+    dest: /var/lib/grafana/dashboards/
+    mode: "0644"
+
+- name: Enable Prometheus
+  ansible.builtin.systemd:
+    name: prometheus
+    state: started
+    enabled: true
+
+- name: Enable node_exporter
+  ansible.builtin.systemd:
+    name: prometheus-node-exporter
+    state: started
+    enabled: true

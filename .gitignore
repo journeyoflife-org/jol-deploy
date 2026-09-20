@@ -1,36 +1,83 @@
 # =============================================================================
-# .gitignore — jol-deploy
+# jol-deploy .gitignore
 # =============================================================================
+
+# --- Secrets (NEVER commit) ---
+*.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.vault
+*.vault.yml
+*.vault.yaml
+sops-age-key.txt
+
+# --- Terraform ---
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+*.tfvars
+!*.tfvars.example
+
+# --- Ansible ---
+ansible/inventories/*/group_vars/*.vault
+ansible/inventories/*/host_vars/*.vault
+*.retry
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# --- Node.js ---
+node_modules/
+npm-debug.log*
+
+# --- Docker ---
+docker-compose.override.yml
 
 # --- IDE ---
 .idea/
-*.iml
 .vscode/
 *.swp
 *.swo
 *~
 
-# --- Python ---
-__pycache__/
-*.py[cod]
-*$py.class
-.venv/
-*.egg-info/
-dist/
-build/
-.eggs/
-
-# --- Secrets & Credentials ---
-*.secret
-*.credentials
-.env
-.env.*
-*.pem
-*.key
-*.crt
-
 # --- OS ---
 .DS_Store
 Thumbs.db
+
+# --- Build artifacts ---
+output/
+artifacts/
+.sbom/
+signatures/
+
+# --- Temporary ---
+.tmp/
+.cache/
+*.log
+
+# --- Test artifacts ---
+coverage/
+htmlcov/
+.pytest_cache/
+
+# --- Backup files ---
 *.bak
-*.tmp
+*.bak.*
+*.backup

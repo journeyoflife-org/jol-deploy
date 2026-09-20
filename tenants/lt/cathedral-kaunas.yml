@@ -1,0 +1,35 @@
+---
+# Tenant: Kaunas Cathedral
+# Country: Lithuania (LT)
+# Environment: production
+
+tenant_id: cathedral-kaunas
+name: "Kauno arkikatedra bazilika"
+country: lt
+domain: "kaunas.cathedral.gyvenimo-kelias.lt"
+environment: production
+
+resources:
+  cpu: "1.0"
+  memory: "512M"
+  disk: "10G"
+
+features:
+  - mass-schedule
+  - parish-news
+  - photo-gallery
+  - contact-form
+
+contacts:
+  admin_email: "admin@kaunas.cathedral.gyvenimo-kelias.lt"
+  tech_email: "tech@gyvenimo-kelias.lt"
+
+backup:
+  rpo_hours: 24
+  rto_hours: 4
+  retention_days: 30
+
+vm:
+  host: her-prod-lt01
+  ip: 10.40.40.20
+  port: 3002

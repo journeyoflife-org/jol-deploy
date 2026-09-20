@@ -1,0 +1,46 @@
+---
+#cloud-config
+# Base cloud-init for all JOL tenant VMs
+hostname: ${vm_name}
+fqdn: ${vm_name}.gyvenimo-kelias.lt
+
+users:
+  - name: jol-admin
+    groups: sudo,docker
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+
+  - name: jol-deploy
+    groups: docker
+    shell: /usr/sbin/nologin
+    system: true
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - wget
+  - jq
+  - docker.io
+  - docker-compose-v2
+  - fail2ban
+  - unattended-upgrades
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/jol-hardening.conf
+    content: |
+      PasswordAuthentication no
+      PermitRootLogin prohibit-password
+      MaxAuthTries 3
+      X11Forwarding no
+    permissions: '0600'
+
+runcmd:
+  - systemctl enable --now docker
+  - systemctl enable --now fail2ban
+  - ufw default deny incoming
+  - ufw allow from 10.60.60.0/24 to any port 22
+  - ufw --force enable

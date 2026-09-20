@@ -1,0 +1,43 @@
+---
+# Deploy a single tenant website to a target VM.
+# Usage: ansible-playbook deploy-tenant.yml -e tenant=basilica-vilnius -e env=production
+
+- name: Deploy tenant website
+  hosts: web_servers
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Validate required variables
+      assert:
+        that:
+          - tenant is defined
+          - jol_environment is defined
+        fail_msg: "Required: -e tenant=<name> -e env=<environment>"
+
+    - name: Create deployment record
+      ansible.builtin.template:
+        src: ../roles/webserver/templates/deployment-record.json.j2
+        dest: "/opt/jol/deployments/{{ tenant }}-{{ ansible_date_time.iso8601_basic_short }}.json"
+        mode: "0644"
+
+  roles:
+    - common
+    - webserver
+
+  post_tasks:
+    - name: Verify deployment health
+      ansible.builtin.uri:
+        url: "http://localhost:{{ app_port | default(3000) }}/health"
+        status_code: 200
+        timeout: 30
+      register: health_result
+      retries: 5
+      delay: 10
+
+    - name: Record deployment success
+      ansible.builtin.lineinfile:
+        path: /var/log/jol-deploy.log
+        line: "{{ ansible_date_time.iso8601 }} | DEPLOY | {{ tenant }} | {{ jol_environment }} | SUCCESS"
+        create: true
+        mode: "0644"

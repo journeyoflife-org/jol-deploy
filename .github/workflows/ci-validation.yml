@@ -1,0 +1,76 @@
+---
+# jol-deploy — CI Validation Workflow
+name: CI Validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: "Validate Configs"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: YAML lint
+        run: pip install yamllint && yamllint -c .yamllint.yaml .
+      - name: Validate tenant schemas
+        run: pip install jsonschema pyyaml && python3 tests/unit/validate-schemas.py
+      - name: ShellCheck
+        run: sudo apt-get install -y shellcheck && shellcheck scripts/*.sh robots/*.sh
+
+  terraform:
+    name: "Terraform Validate"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform fmt check
+        run: terraform fmt -check -recursive infrastructure/terraform/
+      - name: Terraform init + validate
+        run: |
+          for dir in infrastructure/terraform/*/; do
+            cd "$dir" && terraform init -backend=false && terraform validate && cd -
+          done
+
+  ansible:
+    name: "Ansible Validate"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Ansible
+        run: pip install ansible ansible-lint
+      - name: Ansible syntax check
+        run: ansible-playbook --syntax-check infrastructure/ansible/playbooks/*.yml
+
+  security:
+    name: "Security Gates"
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secret scanning (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+      - name: TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
+  test:
+    name: "Test Suite"
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests
+        run: bash tests/unit/run-tests.sh
+      - name: Integration tests
+        run: bash tests/integration/run-tests.sh
+      - name: Tenant isolation tests
+        run: bash tests/isolation/run-tests.sh

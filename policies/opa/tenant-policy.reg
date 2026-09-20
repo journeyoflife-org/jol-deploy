@@ -1,0 +1,61 @@
+# =============================================================================
+# OPA Policy: Tenant Configuration Validation
+# =============================================================================
+# Ensures all tenant configs comply with JOL platform rules.
+# =============================================================================
+
+package jol.tenants
+
+import future.keywords.if
+import future.keywords.in
+
+# Deny if required fields are missing
+deny[msg] if {
+    not input.tenant_id
+    msg := "tenant_id is required"
+}
+
+deny[msg] if {
+    not input.domain
+    msg := "domain is required"
+}
+
+deny[msg] if {
+    not input.country
+    msg := "country is required"
+}
+
+# Deny if country is not in the EU allowlist
+ALLOWED_COUNTRIES := {"lt", "lv", "ee", "pl", "de", "fr", "it", "es", "pt", "other"}
+
+deny[msg] if {
+    not input.country in ALLOWED_COUNTRIES
+    msg := sprintf("country '%s' is not in the EU allowlist", [input.country])
+}
+
+# Deny if resources exceed maximum limits
+deny[msg] if {
+    input.resources.memory
+    mem_value := parse_int(trim_suffix(input.resources.memory, "M"), 10)
+    mem_value > 4096
+    msg := sprintf("memory %s exceeds maximum 4096M", [input.resources.memory])
+}
+
+# Deny if backup RPO is too lax for production
+deny[msg] if {
+    input.environment == "production"
+    input.backup.rpo_hours > 24
+    msg := "production RPO must be ≤ 24 hours"
+}
+
+# Deny if debug is enabled in production
+deny[msg] if {
+    input.environment == "production"
+    input.debug == true
+    msg := "debug must not be enabled in production"
+}
+
+# Allow if no denies
+allow if {
+    count(deny) == 0
+}

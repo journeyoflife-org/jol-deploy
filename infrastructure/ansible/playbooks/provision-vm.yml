@@ -1,0 +1,49 @@
+---
+# Provision a new VM for tenant hosting.
+# Usage: ansible-playbook provision-vm.yml -e vm_name=her-web-lt02 -e vm_id=103
+
+- name: Provision new tenant VM
+  hosts: management
+  become: false
+  gather_facts: false
+
+  vars:
+    proxmox_node: pve-prod-hv01
+    template_id: 9000
+
+  tasks:
+    - name: Validate VM parameters
+      assert:
+        that:
+          - vm_name is defined
+          - vm_id is defined
+        fail_msg: "Required: -e vm_name=<name> -e vm_id=<id>"
+
+    - name: Create VM from template
+      ansible.builtin.command:
+        cmd: >
+          qm clone {{ template_id }} {{ vm_id }}
+          --name {{ vm_name }}
+          --full
+      register: clone_result
+      changed_when: clone_result.rc == 0
+
+    - name: Set VM resources
+      ansible.builtin.command:
+        cmd: >
+          qm set {{ vm_id }}
+          --memory 4096
+          --cores 2
+          --net0 virtio,bridge=vmbr0,tag=40
+      changed_when: true
+
+    - name: Start VM
+      ansible.builtin.command:
+        cmd: qm start {{ vm_id }}
+      changed_when: true
+
+    - name: Wait for VM to be reachable
+      ansible.builtin.wait_for:
+        host: "{{ vm_name }}"
+        port: 22
+        timeout: 300
