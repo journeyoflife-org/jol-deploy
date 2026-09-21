@@ -3,7 +3,14 @@
   "title": "JOL Tenant Configuration",
   "description": "Schema for tenant website configuration files",
   "type": "object",
-  "required": ["tenant_id", "name", "country", "domain", "environment", "resources"],
+  "required": [
+    "tenant_id",
+    "name",
+    "country",
+    "domain",
+    "environment",
+    "resources"
+  ],
   "properties": {
     "tenant_id": {
       "type": "string",
@@ -18,7 +25,18 @@
     },
     "country": {
       "type": "string",
-      "enum": ["lt", "lv", "ee", "pl", "de", "fr", "it", "es", "pt", "other"],
+      "enum": [
+        "lt",
+        "lv",
+        "ee",
+        "pl",
+        "de",
+        "fr",
+        "it",
+        "es",
+        "pt",
+        "other"
+      ],
       "description": "ISO 3166-1 alpha-2 country code"
     },
     "domain": {
@@ -28,47 +46,121 @@
     },
     "environment": {
       "type": "string",
-      "enum": ["development", "staging", "production"],
+      "enum": [
+        "development",
+        "staging",
+        "production"
+      ],
       "description": "Target deployment environment"
     },
     "resources": {
       "type": "object",
-      "required": ["cpu", "memory", "disk"],
+      "required": [
+        "cpu",
+        "memory",
+        "disk"
+      ],
       "properties": {
-        "cpu": { "type": "string", "pattern": "^[0-9.]+$" },
-        "memory": { "type": "string", "pattern": "^[0-9]+[MG]$" },
-        "disk": { "type": "string", "pattern": "^[0-9]+[MG]$" }
+        "cpu": {
+          "type": "string",
+          "pattern": "^[0-9.]+$"
+        },
+        "memory": {
+          "type": "string",
+          "pattern": "^[0-9]+[MG]$"
+        },
+        "disk": {
+          "type": "string",
+          "pattern": "^[0-9]+[MG]$"
+        }
       }
     },
     "features": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Enabled feature flags"
     },
     "contacts": {
       "type": "object",
       "properties": {
-        "admin_email": { "type": "string", "format": "email" },
-        "tech_email": { "type": "string", "format": "email" }
+        "admin_email": {
+          "type": "string",
+          "format": "email"
+        },
+        "tech_email": {
+          "type": "string",
+          "format": "email"
+        }
       }
     },
     "backup": {
       "type": "object",
       "properties": {
-        "rpo_hours": { "type": "integer", "minimum": 1 },
-        "rto_hours": { "type": "integer", "minimum": 1 },
-        "retention_days": { "type": "integer", "minimum": 1 }
+        "rpo_hours": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rto_hours": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "vm": {
       "type": "object",
-      "description": "Target VM assignment for the tenant",
+      "description": "DEPRECATED (D14): per-tenant VM model is incompatible with topology A at ~1,300 tenants. Use sharedRuntime instead.",
       "properties": {
-        "host": { "type": "string", "description": "VM hostname" },
-        "ip": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$", "description": "VM IP address" },
-        "port": { "type": "integer", "minimum": 1, "maximum": 65535, "description": "Application port" }
-      }
+        "host": {
+          "type": "string",
+          "description": "VM hostname"
+        },
+        "ip": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "VM IP address"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Application port"
+        }
+      },
+      "deprecated": true
+    },
+    "sharedRuntime": {
+      "type": "object",
+      "description": "Shared template-renderer runtime (topology A). One runtime resolves N hostnames via wildcard DNS.",
+      "properties": {
+        "service": {
+          "type": "string",
+          "enum": [
+            "template-renderer"
+          ],
+          "description": "The shared rendering service"
+        },
+        "hostname": {
+          "type": "string",
+          "description": "Wildcard DNS hostname, e.g. *.gyvenimo-kelias.lt"
+        },
+        "port": {
+          "type": "integer",
+          "default": 3000,
+          "description": "Application port on the shared runtime"
+        }
+      },
+      "required": [
+        "service",
+        "hostname"
+      ]
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$comment": "DB name reconciliation (F14/F15): ADR-001 uses 'jol-db-pilot-lt01'; Django settings use 'jol_lt_platform_prod'. Unify before Wave 1 API flip."
 }
