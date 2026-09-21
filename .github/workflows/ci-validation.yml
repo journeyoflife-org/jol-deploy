@@ -39,7 +39,7 @@ jobs:
       - name: Terraform init + validate
         run: |
           for dir in infrastructure/terraform/*/; do
-            cd "$dir" && terraform init -backend=false && terraform validate && cd -
+            (cd "$dir" && terraform init -backend=false && terraform validate)
           done
 
   ansible:
@@ -50,7 +50,8 @@ jobs:
       - name: Install Ansible
         run: pip install ansible ansible-lint
       - name: Ansible syntax check
-        run: ansible-playbook --syntax-check infrastructure/ansible/playbooks/*.yml
+        working-directory: infrastructure/ansible
+        run: ansible-playbook --syntax-check playbooks/*.yml
 
   security:
     name: "Security Gates"

@@ -21,7 +21,7 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - {{TENANT_NAME}}-net
+      - "{{TENANT_NAME}}-net"
     deploy:
       resources:
         limits:
@@ -47,8 +47,8 @@ services:
       app:
         condition: service_healthy
     networks:
-      - {{TENANT_NAME}}-net
+      - "{{TENANT_NAME}}-net"
 
 networks:
-  {{TENANT_NAME}}-net:
+  "{{TENANT_NAME}}-net":
     driver: bridge
