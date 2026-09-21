@@ -36,7 +36,7 @@ jobs:
       - name: Terraform init + validate
         run: |
           for dir in infrastructure/terraform/*/; do
-            cd "$dir" && terraform init -backend=false && terraform validate && cd -
+            (cd "$dir" && terraform init -backend=false && terraform validate)
           done
 
   ansible:

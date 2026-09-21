@@ -6,8 +6,8 @@ rules:
     max: 200
     level: warning
   truthy:
-    allowed-values: ['true', 'false', 'yes', 'no']
-    check-keys: true
+    allowed-values: ['true', 'false', 'yes', 'no', 'on']
+    check-keys: false
   comments:
     require-starting-space: true
     min-spaces-from-content: 1
