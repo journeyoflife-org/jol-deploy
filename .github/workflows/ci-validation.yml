@@ -47,7 +47,8 @@ jobs:
       - name: Install Ansible
         run: pip install ansible ansible-lint
       - name: Ansible syntax check
-        run: ansible-playbook --syntax-check infrastructure/ansible/playbooks/*.yml
+        working-directory: infrastructure/ansible
+        run: ansible-playbook --syntax-check playbooks/*.yml
 
   security:
     name: "Security Gates"
