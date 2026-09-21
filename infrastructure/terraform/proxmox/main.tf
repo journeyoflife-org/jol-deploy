@@ -99,7 +99,7 @@ resource "proxmox_virtual_environment_vm" "tenant_vm" {
   }
 
   network_device {
-    bridge = "vmbr0"
+    bridge  = "vmbr0"
     vlan_id = var.vm_vlan_tag
   }
 
