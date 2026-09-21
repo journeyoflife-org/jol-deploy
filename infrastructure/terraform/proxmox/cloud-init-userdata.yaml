@@ -1,0 +1,58 @@
+#cloud-config
+# Cloud-init userdata for JOL tenant VMs
+# Template variables: hostname
+
+hostname: ${hostname}
+fqdn: ${hostname}.gyvenimo-kelias.lt
+
+# Ensure proper locale
+locale: en_LT.UTF-8
+
+# Set timezone
+timezone: Europe/Vilnius
+
+# Package management
+package_update: true
+package_upgrade: true
+packages:
+  - curl
+  - wget
+  - git
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+# Create jol user
+users:
+  - name: jol
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys: []  # Add SSH keys via Proxmox or manually
+
+# Disable password authentication
+ssh_pwauth: false
+
+# Configure SSH
+ssh:
+  AllowRootLogin: false
+  PasswordAuthentication: false
+
+# Write deployment marker
+write_files:
+  - path: /etc/jol-vm-info
+    content: |
+      VM_NAME=${hostname}
+      DEPLOYED_BY=terraform
+      TEMPLATE_VERSION=1.0
+    permissions: '0644'
+
+# Run deployment script on first boot
+runcmd:
+  - echo "JOL tenant VM ${hostname} initialized" > /var/log/jol-init.log
+  - systemctl daemon-reload
+  - systemctl enable ssh
+
+# Final message
+final_message: "JOL tenant VM ${hostname} is ready"
