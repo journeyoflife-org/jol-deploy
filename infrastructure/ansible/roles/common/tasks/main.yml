@@ -38,9 +38,9 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
   loop:
-    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
-    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin prohibit-password' }
-    - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
+    - {regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no'}
+    - {regexp: '^#?PermitRootLogin', line: 'PermitRootLogin prohibit-password'}
+    - {regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3'}
   notify: Restart sshd
 
 - name: Configure UFW default deny
